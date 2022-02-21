@@ -17,7 +17,12 @@
  */
 struct list_head *q_new()
 {
-    return NULL;
+    struct list_head *q = malloc(sizeof(struct list_head));
+    if (q == NULL) {
+        return NULL;
+    }
+    INIT_LIST_HEAD(q);
+    return q;
 }
 
 /* Free all storage used by queue */
@@ -32,6 +37,20 @@ void q_free(struct list_head *l) {}
  */
 bool q_insert_head(struct list_head *head, char *s)
 {
+    if (head == NULL) {
+        return false;
+    }
+    element_t *node = malloc(sizeof(element_t));
+    if (node == NULL) {
+        return false;
+    }
+    node->value = strdup(s);
+    if (node->value == NULL) {
+        free(node);
+        return false;
+    }
+    list_add(&node->list, head);
+
     return true;
 }
 
@@ -44,6 +63,19 @@ bool q_insert_head(struct list_head *head, char *s)
  */
 bool q_insert_tail(struct list_head *head, char *s)
 {
+    if (head == NULL) {
+        return NULL;
+    }
+    element_t *node = malloc(sizeof(element_t));
+    if (node == NULL) {
+        return NULL;
+    }
+    node->val = strdup(s);
+    if (node->value == NULL) {
+        free(node);
+        return false;
+    }
+    list_tail(&node->list, head);
     return true;
 }
 
