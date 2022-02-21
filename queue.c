@@ -70,12 +70,12 @@ bool q_insert_tail(struct list_head *head, char *s)
     if (node == NULL) {
         return NULL;
     }
-    node->val = strdup(s);
+    node->value = strdup(s);
     if (node->value == NULL) {
         free(node);
         return false;
     }
-    list_tail(&node->list, head);
+    list_add_tail(&node->list, head);
     return true;
 }
 
