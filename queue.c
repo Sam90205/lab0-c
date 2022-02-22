@@ -44,13 +44,17 @@ bool q_insert_head(struct list_head *head, char *s)
     if (node == NULL) {
         return false;
     }
-    node->value = strdup(s);
+    size_t size = strlen(s) + 1;
+    node->value = malloc(size);
+    if (node->value) {
+        memcpy(node->value, s, size);
+    }
+
     if (node->value == NULL) {
         free(node);
         return false;
     }
     list_add(&node->list, head);
-
     return true;
 }
 
@@ -70,7 +74,12 @@ bool q_insert_tail(struct list_head *head, char *s)
     if (node == NULL) {
         return NULL;
     }
-    node->value = strdup(s);
+    // node->value = strdup(s);
+    size_t size = strlen(s) + 1;
+    node->value = malloc(size);
+    if (node->value) {
+        memcpy(node->value, s, size);
+    }
     if (node->value == NULL) {
         free(node);
         return false;
@@ -123,7 +132,14 @@ void q_release_element(element_t *e)
  */
 int q_size(struct list_head *head)
 {
-    return -1;
+    int counter = 0;
+    if (head == NULL) {
+        return 0;
+    }
+    struct list_head *tmp;
+    list_for_each (tmp, head)
+        counter++;
+    return counter;
 }
 
 /*
