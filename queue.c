@@ -26,7 +26,17 @@ struct list_head *q_new()
 }
 
 /* Free all storage used by queue */
-void q_free(struct list_head *l) {}
+void q_free(struct list_head *l)
+{
+    if (!l) {
+        return;
+    }
+    element_t *node, *safe;
+    list_for_each_entry_safe (node, safe, l, list) {
+        q_release_element(node);
+    }
+    free(l);
+}
 
 /*
  * Attempt to insert element at head of queue.
@@ -46,9 +56,7 @@ bool q_insert_head(struct list_head *head, char *s)
     }
     size_t size = strlen(s) + 1;
     node->value = malloc(size);
-    if (node->value) {
-        memcpy(node->value, s, size);
-    }
+    memcpy(node->value, s, size);
 
     if (node->value == NULL) {
         free(node);
@@ -77,9 +85,8 @@ bool q_insert_tail(struct list_head *head, char *s)
     // node->value = strdup(s);
     size_t size = strlen(s) + 1;
     node->value = malloc(size);
-    if (node->value) {
-        memcpy(node->value, s, size);
-    }
+    memcpy(node->value, s, size);
+
     if (node->value == NULL) {
         free(node);
         return false;
@@ -104,7 +111,19 @@ bool q_insert_tail(struct list_head *head, char *s)
  */
 element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 {
-    return NULL;
+    if (!head || list_empty(head)) {
+        return NULL;
+    }
+    if (!sp) {
+        return NULL;
+    }
+    element_t *node = list_first_entry(head, element_t, list);
+    size_t len = strlen(node->value);
+    len = len > bufsize ? bufsize : len;
+    memcpy(sp, node->value, len);
+    sp[len] = '\0';
+    list_del(&node->list);
+    return node;
 }
 
 /*
@@ -113,7 +132,21 @@ element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
  */
 element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
 {
-    return NULL;
+    if (!head || list_empty(head)) {
+        return NULL;
+    }
+    if (!sp) {
+        return NULL;
+    }
+
+    element_t *node = list_last_entry(head, element_t, list);
+    size_t len = strlen(node->value);
+    len = len > bufsize ? bufsize : len;
+    memcpy(sp, node->value, len);
+    sp[len] = '\0';
+    list_del(&node->list);
+
+    return node;
 }
 
 /*
