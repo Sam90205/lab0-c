@@ -114,7 +114,7 @@ element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
     if (!head || list_empty(head)) {
         return NULL;
     }
-    if (!sp) {
+    if (!sp || !bufsize) {
         return NULL;
     }
     element_t *node = list_first_entry(head, element_t, list);
@@ -186,6 +186,18 @@ int q_size(struct list_head *head)
 bool q_delete_mid(struct list_head *head)
 {
     // https://leetcode.com/problems/delete-the-middle-node-of-a-linked-list/
+    if (!head || list_empty(head)) {
+        return false;
+    }
+    struct list_head *slow = head->next;
+    struct list_head *fast = head->next->next;
+    for (; fast != head && fast->next != head; fast = fast->next->next) {
+        slow = slow->next;
+    }
+
+    element_t *node = list_entry(slow, element_t, list);
+    list_del(slow);
+    q_release_element(node);
     return true;
 }
 
@@ -219,7 +231,19 @@ void q_swap(struct list_head *head)
  * (e.g., by calling q_insert_head, q_insert_tail, or q_remove_head).
  * It should rearrange the existing ones.
  */
-void q_reverse(struct list_head *head) {}
+void q_reverse(struct list_head *head)
+{
+    if (!head || list_empty(head)) {
+        return;
+    }
+    struct list_head *curr = head;
+    do {
+        struct list_head *temp = curr->next;
+        curr->next = curr->prev;
+        curr->prev = temp;
+        curr = curr->prev;
+    } while (curr != head);
+}
 
 /*
  * Sort elements of queue in ascending order
